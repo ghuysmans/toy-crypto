@@ -177,7 +177,7 @@ module Crypto (N : Num) = struct
         type 'a key
         type secret
         type public
-        val derivate : N.t -> N.t -> public key * secret key
+        val derive : N.t -> N.t -> public key * secret key
         val generate : int -> public key * secret key
         val encrypt : public key -> N.t -> N.t
         val decrypt : secret key -> N.t -> N.t
@@ -189,7 +189,7 @@ module Crypto (N : Num) = struct
         type 'a key = {modulus: N.t; exponent: N.t}
         type secret
         type public
-        let derivate p q =
+        let derive p q =
             let open N in
             let phi = (p - one) * (q - one) in
             let e =
@@ -217,7 +217,7 @@ module Crypto (N : Num) = struct
         let generate n_bits =
             let p = generate_prime n_bits in
             let q = generate_prime n_bits in
-            derivate p q
+            derive p q
         let encrypt = rsa
         let decrypt = rsa
         let sign = rsa
