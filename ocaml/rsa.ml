@@ -256,7 +256,6 @@ end
 let () =
     Random.self_init ();
     let module Crypto = Crypto (BigInt) in
-    let open Crypto.RSA in
     let n_args = Array.length Sys.argv in
     let p = Sys.argv.(0) in
     let help ret =
@@ -282,31 +281,34 @@ let () =
         help 0
     else (
         let cmd = Sys.argv.(1) in
-        if cmd = "generate" && n_args = 3 then (
-            Random.self_init ();
+        if cmd = "help" then
+            help 0
+        else if cmd = "generate" && n_args = 3 then (
+            let open Crypto.RSA in
             let bits = int_of_string Sys.argv.(2) in
             let public, secret = generate bits in
             print_endline "public key:";
             export_key public stdout;
-            print_endline "secret key:";
-            export_key secret stdout
+            output_string stderr "secret key:";
+            export_key secret stderr
         )
         else if (cmd = "encrypt" || cmd = "decrypt") && n_args = 3 then (
             let keyfile = open_in Sys.argv.(2) in
+            let open Crypto.RSA in
             if cmd = "encrypt" then
                 if input_line keyfile = "public key:" then
                     let message = Crypto.of_string (read_line ()) in
                     let public = import_key keyfile in
                     Crypto.write (encrypt public message) stdout
                 else
-                    failwith "not a public key!"
+                    failwith "expected a public key!"
             else
                 if input_line keyfile = "secret key:" then
                     let cipher = Crypto.read stdin in
                     let secret = import_key keyfile in
                     print_string (Crypto.to_string (decrypt secret cipher))
                 else
-                    failwith "not a secret key!"
+                    failwith "expected a secret key!"
         )
         else (
             let open Crypto.DH in
