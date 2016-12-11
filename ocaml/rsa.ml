@@ -254,6 +254,7 @@ module Crypto (N : Num) = struct
 end
 
 let () =
+    Random.self_init ();
     let module Crypto = Crypto (BigInt) in
     let open Crypto.RSA in
     let n_args = Array.length Sys.argv in
