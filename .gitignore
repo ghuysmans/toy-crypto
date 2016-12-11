@@ -1,0 +1,14 @@
+*.byte
+_tags
+_build
+*.key
+*.dh
+
+*.aux
+*.log
+*.out
+*.toc
+*.idx
+*.ilg
+*.ind
+*.pdf
