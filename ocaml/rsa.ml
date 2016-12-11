@@ -224,20 +224,58 @@ module Crypto (N : Num) = struct
         let check (public, signature) input =
             N.(rsa public signature = input)
     end
+    module DH = struct
+        type parameters = {modulus: N.t; generator: N.t; n_bits: int}
+        let generate n_bits =
+            let modulus = generate_prime n_bits in
+            let generator = random n_bits in
+            {modulus; generator; n_bits}
+        let challenge {modulus; generator; n_bits} =
+            let secret = random n_bits in
+            secret, modpow generator secret modulus
+        let derive {modulus; _} secret received_challenge =
+            (* on both sides, (g ^ remote) ^ local = g ^ (remote * local) *)
+            modpow received_challenge secret modulus
+        let import_parameters chan =
+            if input_line chan = "parameters:" then
+                let modulus = read chan in
+                let generator = read chan in
+                let n_bits = int_of_string (input_line chan) in
+                Some {modulus; generator; n_bits}
+            else
+                None
+        let export_parameters {modulus; generator; n_bits} chan =
+            output_string chan "parameters:\n";
+            write modulus chan;
+            write generator chan;
+            output_string chan (string_of_int n_bits);
+            output_char chan '\n'
+    end
 end
 
 let () =
     let module Crypto = Crypto (BigInt) in
     let open Crypto.RSA in
     let n_args = Array.length Sys.argv in
+    let p = Sys.argv.(0) in
     let help ret =
-        Printf.printf "%s generate bits\n" Sys.argv.(0);
-        Printf.printf "%s encrypt public.key\n" Sys.argv.(0);
-        Printf.printf "%s decrypt secret.key\n" Sys.argv.(0);
+        Printf.printf (
+            "RSA:\n" ^^
+            "%s generate bits\n" ^^
+            "%s encrypt public.key\n" ^^
+            "%s decrypt secret.key\n\n")
+            p p p;
         (* TODO
         Printf.printf "%s sign secret.key\n" Sys.argv.(0);
         Printf.printf "%s check public.key signature\n" Sys.argv.(0);
         *)
+        Printf.printf (
+            "Diffie-Hellman:\n" ^^
+            "%s parameters bits\n" ^^
+            "%s challenge parameters.dat\n" ^^
+            "%s derive1 parameters.dat\n" ^^
+            "%s derive2 parameters.dat\n")
+            p p p p;
         exit ret in
     if n_args = 1 then
         help 0
@@ -269,8 +307,47 @@ let () =
                 else
                     failwith "not a secret key!"
         )
-        else if Sys.argv.(1) = "help" then
-            help 0
-        else
-            help 1
+        else (
+            let open Crypto.DH in
+            if (cmd = "challenge" || cmd = "derive1" || cmd = "derive2") &&
+                    n_args = 3 then (
+                let parameters =
+                    let chan = open_in Sys.argv.(2) in
+                    match import_parameters chan with
+                        | Some p -> p
+                        | None -> failwith "not DH parameters!" in
+                let do_derive secret =
+                    if read_line () = "challenge:" then
+                        let received = Crypto.read stdin in
+                        let shared = derive parameters secret received in
+                        output_string stderr "shared:\n";
+                        Crypto.write shared stderr;
+                        shared
+                    else
+                        failwith "expected a challenge!" in
+                let do_challenge () =
+                    let secret, challenge = challenge parameters in
+                    output_string stderr "secret:\n";
+                    Crypto.write secret stderr;
+                    print_endline "challenge:";
+                    Crypto.write challenge stdout;
+                    secret in
+                if cmd = "challenge" then
+                    ignore (do_challenge ())
+                else if cmd = "derive1" then (
+                    let secret = do_challenge () in
+                    ignore (do_derive secret)
+                )
+                else if read_line () = "secret:" then
+                    let secret = Crypto.read stdin in
+                    ignore (do_derive secret)
+                else
+                    failwith "expected a secret key!"
+            )
+            else if cmd = "parameters" && n_args = 3 then
+                let parameters = generate (int_of_string Sys.argv.(2)) in
+                export_parameters parameters stdout
+            else
+                help 1
+        )
     )
