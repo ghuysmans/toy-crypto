@@ -270,6 +270,46 @@ de toute façon, les réels ne servent à rien ici.
 		\end{align*}
 	\end{proof}
 \end{thm}
+\begin{pr}[Test de Fermat]
+	Soit $n \in \esN_0$.
+	Supposons que $\exists a \in \esN_0 : a^{n-1} \not\equiv_n 1$.
+	Par Fermat (contraposée), $n \not\in \esP$.
+
+	Au moins la moitié des entiers plus petits que $p$ ne passeront pas le test.
+	En prenant un entier au hasard plus petit que $p$, on a donc une chance
+	sur deux de prouver que ce nombre n'est pas premier.
+
+	Les (rares mais infiniment nombreux) nombres de Carmichael
+	passeront toujours ce test sans être premiers.
+	On peut les tester (TODO p38 ?)
+	\begin{cproof}{Gillis}
+		\[
+			\forall b \in \esN_0 : b^{p-1}\equiv_p1
+			\implies
+			(ab)^{p-1} \equiv_p a^{p-1} \not\equiv_p 1
+		\]
+		À tout $b$ qui passe le test, on peut associer $b'=ab$
+		qui ne le passe forcément pas.
+	\end{cproof}
+\end{pr}
+\begin{thm}[Lagrange]
+	Soit $\pi(x)=\left|\left\{p\in\esP \; \middle| \; p\leq x \right\}\right|$.
+	\[
+		\lim_{x\to+\infty}\frac{\pi(x)}{x/\ln(x)}=1
+		\implies
+		\pi(x) \approx \frac x{\ln(x)}
+	\]
+\end{thm}
+\begin{pr}[Génération de premiers]
+	\[
+		P\left(x \in \esP, x \leq e^n \right) =
+		\frac{\pi(x)}x=\frac1{\ln(x)}\approx\frac1n
+	\]
+
+	\cite{Gillis} : En moyenne, on devra donc générer
+	de l'ordre de $n$ nombres
+	avant de trouver un premier à $n$ chiffres.
+\end{pr}
 \begin{df}[Groupe] $(G, \bullet)$ est groupe si :
 	\begin{itemize}
 		\item $\bullet$ est une opération binaire...
