@@ -196,7 +196,7 @@ de toute façon, les réels ne servent à rien ici.
 		soit $x-x' \equiv_m 0$.
 	\end{cproof}
 \end{pr}
-\begin{thm}[Fermat]
+\begin{thm}[Fermat]\label{thm:fermat}
 	Soient $a \in \esN, p \in \esP$. \[
 		a^p \equiv_p a
 	\]
@@ -526,33 +526,30 @@ avec la clé privée, ce qui permet à n'importe qui de le déchiffrer
 		\end{align*}
 	\end{cproof}
 	\begin{cproof}{hac} ~
-		\begin{itemize}
-			\item $ed\equiv_\phi1 \dbi \exists k \in \esN : ed=1+k\phi$
-			\item Deux possibilités pour $p$ :
-				\begin{enumerate}
-					\item Si $(M,p)=1$, alors :
-						\begin{align*}
-							M^{p-1} &\equiv_p 1
-								&& \text{par Fermat} \\
-							M^{k\left(p-1\right)\left(q-1\right)} &\equiv_p 1
-								&& \text{même puissance} \\
-							M^{1+k\left(p-1\right)\left(q-1\right)} &\equiv_p M
-								&& \text{produit avec }m
-						\end{align*}
-					\item Si $(M,p)=p$, alors la dernière étape <<~annule~>>
-						tout mais la congruence reste vraie.
-				\end{enumerate}
-				Dans les deux cas, on trouve : \[
-					M^{ed} \equiv_p M
-				\]
-			\item Idem pour $q$ : \[
-					M^{ed} \equiv_q M
-				\]
-			\item Comme $p \neq q$ et $(p,q)=1$ : \[
-					M^{ed} \equiv_n M
-			\]
-		\end{itemize}
-		\emph{Ainsi, on utilise Fermat (sinon, seul Euler est utile).}
+		\[
+			ed\equiv_\phi1 \dbi \exists k \in \esN : ed=1+k\phi
+		\]
+		\begin{align*}
+			M^{p-1} &\equiv_p 1
+				&& \text{par Fermat (\ref{thm:fermat})} \\
+			M^{k\left(p-1\right)\left(q-1\right)} &\equiv_p 1
+				&& \text{même puissance} \\
+			M^{1+k\left(p-1\right)\left(q-1\right)} &\equiv_p M
+				&& \text{produit avec }m
+		\end{align*}
+
+		Si $(M,p)=p$, la dernière étape <<~annule~>> tout
+		mais la congruence reste vraie. On trouve : \[
+			M^{ed} \equiv_p M
+		\]
+
+		Le même raisonnement s'applique à $q$ : \[
+			M^{ed} \equiv_q M
+		\]
+
+		Comme $p \neq q$ et $(p,q)=1$ : \[
+			M^{ed} \equiv_n M
+		\]
 	\end{cproof}
 \end{thm}
 
