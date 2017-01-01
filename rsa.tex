@@ -200,11 +200,14 @@ de toute façon, les réels ne servent à rien ici.
 	Soient $a \in \esN, p \in \esP$. \[
 		a^p \equiv_p a
 	\]
+
+	Sans perte de généralité, supposons que $(a,p)=1$
+	(sinon, ça reste vrai : $0 \equiv_p 0$).
 	\begin{proof}[Transformation \cite{Gillis}]
 		\begin{align*}
-			a^pa^{-1} & \equiv_p aa^{-1} && \forall x \in \esZ, (x,p)=1 \\
-			a^{p-1}1 & \equiv_p 1 && \forall x \in \esZ, xx^{-1} \equiv_p 1 \\
-			a^{p-1} & \equiv_p 1 && \forall x \in \esZ, x1 \equiv_p x
+			a^pa^{-1} & \equiv_p aa^{-1} && \text{multiplication} \\
+			a^{p-1}1 & \equiv_p 1 && aa^{-1} \equiv_p 1 \\
+			a^{p-1} & \equiv_p 1 && 1 \text{ neutre}
 		\end{align*}
 	\end{proof}
 	\begin{proof}[Permutations \cite{Buys}]
