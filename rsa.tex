@@ -557,6 +557,23 @@ avec la clé privée, ce qui permet à n'importe qui de le déchiffrer
 \end{thm}
 
 \subsection{Optimisation}
+\begin{pr}
+	Soient $a,b,c \in \esN, p \in \esP$. \[
+		b \equiv_{p-1} c
+		\implies
+		a^b \equiv_p a^c
+	\]
+	\begin{proof}
+		\begin{align*}
+			\exists k \in \esZ \quad b
+			&= k\left(p-1\right)+c && \text{définition} \\
+			a^c
+			&\equiv_p a^{k\left(p-1\right)+c} && \text{thèse} \\
+			&\equiv_p \left(a^{p-1}\right)^ka^c && \text{exposants} \\
+			&\equiv_p 1^ka^c && \text{par Fermat (\ref{thm:fermat})}
+		\end{align*}
+	\end{proof}
+\end{pr}
 \begin{thm}[Restes chinois]\label{thm:chrem}
 	Soient $x,a,b \in \esN$ et $p,q \in \esN_0$ tels que $(p,q)=1$. On a : \[
 		\left\{\begin{array}{ll}
