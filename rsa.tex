@@ -435,12 +435,12 @@ de toute façon, les réels ne servent à rien ici.
 		la seule chose qui nous intéresse à la fin est leur reste.
 	\end{proof}
 \end{pr}
-\begin{thm}[Euler]
+\begin{thm}[Euler]\label{thm:euler}
 	Soient $x \in \esZ, m \in \esN_0$. \[
 		(x,m) = 1 \implies x^{\phi(m)} \equiv_m 1
 	\]
 	\begin{proof}[Cas particulier]
-		Si $x \in \esP$, c'est Fermat.
+		Si $x \in \esP$, c'est Fermat (\ref{thm:fermat}).
 	\end{proof}
 	\begin{cproof}{Buys}
 		$G=\left\{a\in\esN \; \middle| \; a \leq m \land (a,m)=1\right\}$
@@ -520,7 +520,7 @@ avec la clé privée, ce qui permet à n'importe qui de le déchiffrer
 			&\equiv_n M\left(M^\phi\right)^k
 				&& \text{propriété des exposants} \\
 			&\equiv_n M \times 1^k
-				&& \text{par Euler, } M^\phi\equiv_n 1 \\
+				&& \text{par Euler (\ref{thm:euler}), } M^\phi\equiv_n 1 \\
 			&\equiv_n M
 				&& \text{1 neutre}
 		\end{align*}
@@ -634,7 +634,7 @@ pour accélérer le déchiffrement et la signature :
 
 \subsection{Le danger d'un petit $e$}
 Selon \cite[p. 288]{hac}, il est intéressant de prendre un nombre avec
-peu de bits à 1 pour d'accélérer le chiffrement, par exemple 3 ou 65537...
+peu de bits à 1 pour accélérer le chiffrement, par exemple 3 ou 65537...
 Il faut quand même veiller à respecter la condition : pour 3, ni $p-1$ ni $q-1$
 ne peuvent être divisibles par 3.
 
@@ -650,8 +650,8 @@ En utilisant le théorème \ref{thm:chremg},
 on peut retrouver $M^3 \mod n_1n_2n_3$ et en calculer la racine cubique entière.
 Le modulo ne gênera pas puisque $M^3<n_1n_2n_3$ !
 
-Pour éviter ce problème, il suffit de saler le message envoyé, c'est-à-dire y
-insérer des bits pseudo-aléatoires.
+Pour éviter ce problème, il suffit de \emph{saler} le message envoyé,
+c'est-à-dire y insérer des bits pseudo-aléatoires.
 
 
 \section{Diffie-Hellman}
@@ -660,9 +660,11 @@ insérer des bits pseudo-aléatoires.
 		et d'un générateur $g$ de $\esF_p^*$ (publics).
 	\item Alice génère et stocke $a<p$ et envoie $g^a \mod p$.
 	\item Bob génère et stocke $b<p$ et envoie $g^b \mod p$.
-	\item Chacun calcule $K = g^{ab} \mod p = r^s \mod p$, avec $r$ ce qui a été
-		reçu et $s$ son secret. $K$ est la même des deux côtés ($ab=ba$ à
-		l'exposant) mais n'a jamais été partagée explicitement.
+	\item Chacun calcule de son côté la clé partagée
+		$g^{ab} \mod p = r^s \mod p$,
+		avec $r$ ce qui a été reçu et $s$ son secret.
+		Elle sera identique ($ab=ba$ à l'exposant)
+		sans jamais avoir été partagée explicitement.
 \end{enumerate}
 
 Attention : Alice pourrait parler à Ève, placée entre elle et Bob, en croyant
@@ -693,7 +695,7 @@ que le message en clair. $k$ est une clé \emph{éphémère} !
 Déchiffrement :
 \begin{align*}
 	M &= M_2 M_1^{-a} \mod p && \text{bof car division} \\
-	&= M_2 M_1^{(p-1)-a} \mod p && \text{idem par Fermat}
+	&= M_2 M_1^{(p-1)-a} \mod p && \text{par Fermat (\ref{thm:fermat})}
 \end{align*}
 
 \begin{thm}[El Gamal]
