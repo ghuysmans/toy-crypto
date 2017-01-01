@@ -12,3 +12,8 @@ _build
 *.ilg
 *.ind
 *.pdf
+*.bib
+*.bbl
+*.blg
+
+*.swp

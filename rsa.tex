@@ -1,0 +1,692 @@
+\documentclass[11pt,twocolumn]{article}
+\usepackage{fullpage}
+\usepackage[a4paper, margin=1.5cm, bottom=3cm]{geometry}
+\usepackage{fourier} %fonte plus lisible
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\let\mod\undefined
+\DeclareMathOperator{\mod}{mod}
+\usepackage{amsthm}
+\theoremstyle{plain}
+\newtheorem{df}{Définition}
+\newtheorem{pr}{Propriété}
+\newtheorem{thm}{Théorème}
+\newcommand{\esP}{\mathbb{P}} %premiers
+\newcommand{\esN}{\mathbb{N}} %naturels
+\newcommand{\esZ}{\mathbb{Z}} %entiers
+\newcommand{\esF}{\mathbb{F}} %corps fini
+\newcommand{\dbi}{\Longleftrightarrow}
+\usepackage[fixlanguage]{babelbib}
+\selectbiblanguage{french}
+\usepackage{cite}
+\usepackage{enumerate}
+\newenvironment{cproof}[1]{\begin{proof}[Démonstration \cite{#1}]}{\end{proof}}
+
+\title{Cryptographie asymétrique}
+\author{Guillaume \textsc{Huysmans}}
+\hypersetup{pdfauthor={Guillaume Huysmans},
+	pdftitle={Cryptographie asymétrique},
+	pdfsubject={algèbre modulaire, sécurité, cryptographie moderne},
+	pdfkeywords={cryptographie, algèbre modulaire, sécurité, maths, math}}
+
+\begin{document}
+\maketitle
+
+Ce document synthétise
+\emph{de manière incomplète et sûrement truffée d'erreurs}
+des maths abordées en MAB1 en Sciences Informatiques à l'UMONS.
+N'hésitez pas à me transmettre vos remarques,
+commentaires \& suggestions par e-mail !
+
+La dernière version de ce document et de l'outil-jouet
+\footnote{J'en déconseille toute utilisation sérieuse
+	(\emph{timing attack}, stockage simpliste,
+	non-vérification des clés...)}
+qui l'accompagne est disponible en ligne : \\
+\url{https://github.com/ghuysmans/toy-crypto}
+
+
+\section{Théorie des nombres}
+On se permettra d'écrire
+$[5;42[ = \left\{n \in \esN \; \middle| \; 5 \leq n < 42\right\}$ :
+de toute façon, les réels ne servent à rien ici.
+
+\begin{df}[Divise] Soient $a, b \in \esZ$. \[
+	a/b \dbi \exists k \in \esZ : b = ka
+\] \end{df}
+\begin{df}[PGCD] Soient $a, b \in \esZ$. \[
+	(a,b) = \min \left\{n \in \esN \; \middle| \; n/a \land n/b\right\}
+\] \end{df}
+\begin{pr}\label{pr:min}
+	Soient $a, b \in \esZ$.
+	Soit $I = \left\{ax + by \; \middle| \; x,y \in \esZ\right\}$. \[
+		(a,b) = \min (I \cap \esN_0)
+	\]
+	\begin{cproof}{Buys}
+		Soit $d = \min (I \cap \esN_0)$.
+		\begin{enumerate}
+			\item $d$ divise $a$ :
+				\begin{itemize}
+					\item par définition,
+						$\exists u, v \in \esZ : au + bv = d$
+					\item par l'absurde, supposons $\lnot(d/a)$ : \\
+						$\exists r \in \; ]0;d[ \; : a = dq + r$
+					\item $r=a-dq=a-(au+bv)q=a(1-uq)+b(-vq)$
+					\item par définition, $r \in I$
+					\item contradiction (FIXME où ça ?)
+				\end{itemize}
+			\item $d$ divise $b$ :
+				\begin{itemize}
+					\item par l'absurde, supposons $\lnot(d/b)$...
+					\item $r=b-dq=b-(au+bv)q=b(1-vq)+a(-uq)$
+				\end{itemize}
+			\item Soit $d' \in \esZ$ tel que $d'/a$ et $d'/b$. $d' \leq d$ : \\
+				$d'$ divise chaque terme de $au+bv=d$
+		\end{enumerate}
+		Par définition, $d=(a,b)$.
+	\end{cproof}
+\end{pr}
+\begin{pr} Soient $a, b \in \esZ, m \in \esN_0$. \[
+	(a, m) = 1 \land (b, m) = 1 \implies (ab, m) = 1
+\] \end{pr}
+\begin{thm}[Euclide]
+	Soient $a \geq b \in \esZ$. \[
+		(a, b) = \left\{
+			\begin{array}{ll}
+				a & \text{si } b=0 \\
+				(b, a \; \mod \; b) & \text{sinon} \\
+			\end{array}
+		\right.
+	\]
+	\begin{cproof}{Conlen} ~
+		\begin{itemize}
+			\item[$b=0$] Trivial.
+			\item[$b\neq0$]
+				$\exists q, r \in \esZ : a = qb+r$ (division avec reste). \\
+				Soient $x=(a,b), y=(b,r)$.
+				\begin{itemize}
+					\item $x/y$ : $x/a$ et $x/b$, donc $x/qb$ et $x/(a-qb=r)$.
+					\item $y/x$ : $y/b$ et $y/(a-qb)$, donc $y/a$.
+				\end{itemize}
+				On en déduit que $x=y$.
+		\end{itemize}
+		On peut ainsi itérativement calculer un PGCD en recommençant avec
+		$(b,r)$ jusqu'à ce que $b=0$.
+	\end{cproof}
+\end{thm}
+\begin{thm}[Bézout]
+	Soient $a, b \in \esZ$ ($a=0 \oplus b=0$). \[
+		\exists u, v \in \esZ : au+bv = (a, b)
+	\]
+	\begin{proof}[Bah oui !]
+		Par la propriété \ref{pr:min}, ils existent puisque le PGCD est dans $I$
+		et que ses éléments s'écrivent sous cette forme.
+		\emph{(Pas très constructif, tout ça...)}
+	\end{proof}
+	\begin{proof}[Euclide étendu \cite{Gillis}]
+		Soient $a \geq b \geq 0$ :
+		\begin{itemize}
+			\item Cas de base $b=0$. Prenons $u=1, v=0, (a,0)=a$.
+			\item Pas de récurrence : $a=bq+r$ par division euclidienne.
+				Supposons (hypothèse de récurrence) que
+				ça fonctionne pour $\forall b'<b$.
+				Utilisons-la avec $a'=b, b'=a\mod b<b$, elle nous donne : \[
+					\exists u', v' \quad bu'+rv' = (b,r)
+				\]
+
+				Prenons $u=v', v=u'-qv'$.
+				Par le théorème d'Euclide, $(a,b)=(b,r)$.
+				Montrons que :
+				\begin{align*}
+					au+bv&=(a,b) && \text{thèse} \\
+					av'+b\left(u'-qv'\right)&=(b,r) && \text{substitutions} \\
+					v'\left(a-bq\right)+bu'&=(b,r) && \text{mise en évidence} \\
+					v'r+bu'&=(b,r) && r=a-bq
+				\end{align*}
+
+				C'est notre hypothèse de récurrence.
+		\end{itemize}
+	\end{proof}
+\end{thm}
+\newpage
+\begin{pr}[Inverse modulaire]
+	Soient $a \in \esZ, m \in \esN_0$. \[
+		\exists x \in \esZ : ax \equiv_m 1 \dbi (a,m)=1
+	\]
+	\begin{proof} ~
+		\begin{itemize}
+			\item[$\Rightarrow$]
+				Soit $x \in \esZ$.
+				Supposons $\exists y \in \esZ : ax-ym=1$.
+				Par la propriété \ref{pr:min},
+				$(a,m)=1$ puisque $\min(\esN_0)=1\in I$.
+			\item[$\Leftarrow$]
+				Par Bézout (puisque $m \neq 0$), on sait que
+				$\exists u, v \in \esZ : au+mv = (a, b) = 1$.
+				Prenons $x=u$. On a bien $\exists y \in \esZ : au-ym=1$,
+				il suffit de prendre $y=-v$.
+		\end{itemize}
+	\end{proof}
+	\begin{proof}[Une autre \cite{Buys}] ~
+		\begin{itemize}
+			\item[$\Rightarrow$]
+				Par définition, $d/a$ et $d/m$.
+				Par hypothèse (réécrite), $m/(ax-1)$.
+				Par transitivité, $d/(ax-1)$.
+				Forcément, $d/ax$.
+				Donc $d/1$, c'est-à-dire $d=1$.
+			\item[$\Leftarrow$]
+				Par Bézout, $\exists u, v \in \esZ : au+mv \equiv_m 1$.
+				Les $mv$ se font tuer par le modulo, il reste
+				$\exists u \in \esZ : au \equiv_m 1$.
+		\end{itemize}
+	\end{proof}
+\end{pr}
+\begin{pr}[Inverse unique]
+	Soient $a, x, x' \in \esZ, m \in \esN_0$. \[
+		(ax \equiv_m 1) \land (ax' \equiv_m 1) \implies x \equiv_m x'
+	\]
+	\begin{cproof}{Buys}
+		$a(x-x') \equiv_m 1$.
+		Une règle analogue à celle du produit nul s'applique :
+		soit $a \equiv_m 0$ (impossible car $(a,m)=1$),
+		soit $x-x' \equiv_m 0$.
+	\end{cproof}
+\end{pr}
+\begin{thm}[Fermat]
+	Soient $a \in \esN, p \in \esP$. \[
+		a^p \equiv_p a
+	\]
+	\begin{proof}[Transformation \cite{Gillis}]
+		\begin{align*}
+			a^pa^{-1} & \equiv_p aa^{-1} && \forall x \in \esZ, (x,p)=1 \\
+			a^{p-1}1 & \equiv_p 1 && \forall x \in \esZ, xx^{-1} \equiv_p 1 \\
+			a^{p-1} & \equiv_p 1 && \forall x \in \esZ, x1 \equiv_p x
+		\end{align*}
+	\end{proof}
+	\begin{proof}[Permutations \cite{Buys}]
+		Construisons un tableau en partant d'une ligne avec tous les éléments
+		du corps fini $\esF_p^* = \esF_p \setminus \{0\}$ et regardons une
+		ligne des $a^{\text{èmes}}$ multiples de la première :
+		$\left[a, 2a, 3a \dots \left(p-1\right)a\right] \mod p$.
+
+		Aucun élément de la première ligne n'est multiple de $p$ (on s'arrête à
+		$p-1$) et le produit de deux non multiples (ces éléments et le
+		multiplicateur de chaque ligne) reste non multiple : aucun élément ne
+		sera nul. Il n'y a pas non plus de répétitions :
+		\begin{align*}
+			\exists x \neq y \qquad\qquad
+			xa & \equiv_p ya && \text{par l'absurde} \\
+			xa - ya & \equiv_p 0 && \text{changement de côté} \\
+			a \left(x - y\right) & \equiv_p 0 && \text{mise en évidence} \\
+			x & \equiv_p y && \lnot \left(a \equiv_p 0\right)
+		\end{align*}
+
+		Le produit des éléments d'une ligne est constant (chacune est donc une
+		permutation de la première) :
+		\begin{align*}
+			(1a)(2a)\dots\left(p-1\right)a
+			& \equiv_p \left(p-1\right)!a^{p-1} && \text{regroupements} \\
+			& \equiv_p \left(p-1\right)! && a=1 \implies 1^{p-1} = 1
+		\end{align*}
+
+		On peut simplifier les factorielles puisque
+		leurs facteurs inférieurs à $p$ ne seront pas <<~nuls~>>.
+	\end{proof}
+	\begin{proof}[Binôme de Newton \cite{Buys}]
+		Dans le triangle de Pascal, pour $p \in \esP$ (ligne) et
+		$k \in ]0;p[$ (colonne), on ne trouve que des multiples de $p$
+		à l'intérieur. \emph{Joli, hein ?}
+
+		\[
+			\binom p k = \frac{p!}{\left(p-k\right)!k!}
+		\]
+
+		\begin{align*}
+			a^p
+			&= \left(1+\left(a-1\right)\right)^p && \text{artifice de calcul} \\
+			&= \sum_{k=0}p \binom pk(a-1)^k1^{p-k} && \text{binôme de Newton} \\
+			&\equiv_p 1 + (a-1)^p && \text{TODO pourquoi ?}
+		\end{align*}
+
+		On calcule ça $\forall i \in [1;a]$ :
+		\begin{align*}
+			1^p &\equiv_p 1+0 \\
+			2^p &\equiv_p 1+1^p \\
+			3^p &\equiv_p 1+2^p \\
+			& ~~\vdots \\
+			(a-1)^p &\equiv_p 1+(a-2)^p \\
+			a^p &\equiv_p 1+(a-1)^p
+		\end{align*}
+
+		On somme tout :
+		\begin{align*}
+			\left(1^p + 2^p \cdots + (a-1)^p\right) + a^p
+				&\equiv_p a + \left(1^p + 2^p \cdots + (a-1)^p\right) \\
+			a^p &\equiv_p a
+		\end{align*}
+	\end{proof}
+\end{thm}
+\begin{df}[Groupe] $(G, \bullet)$ est groupe si :
+	\begin{itemize}
+		\item $\bullet$ est une opération binaire...
+			\begin{itemize}
+				\item interne : \\
+					$\forall a, b \in G, \exists c \in G : a \bullet b = c$
+				\item associative : \\
+					$\forall a, b, c \in G,
+					(a \bullet b) \bullet c = a \bullet (b \bullet c)$
+			\end{itemize}
+		\item $G$ possède un unique élément neutre : \\
+			$\exists e \in G, \forall x \in G : x \bullet e = e \bullet x = x$
+		\item Tout élément admet un symétrique : \\
+			$\forall x \in G, \exists x' \in G : x \bullet x' = e$
+	\end{itemize}
+\end{df}
+\begin{df}[Indicateur d'Euler] Soit $m \in \esN$. \[
+	\phi(m) = \left|\left\{n \in \esN \; \middle| \;
+	n < m \land (n,m)=1 \right\}\right|
+\] \end{df}
+\begin{pr} Soit $p \in \esP$. Puisque $(0,p)=p$, \[
+		\phi(p)=p-1
+\] \end{pr}
+\begin{pr}
+	Soit $m \in \esN$. \[
+		\phi(m) = m \left.\prod_{p/m} \left(1 - \frac1p\right)\right.
+		\quad (p \in \esP)
+	\]
+	\begin{cproof}{Buys} ~
+		\begin{itemize}
+			\item Les éléments qui ont un facteur commun avec $p^\alpha$ sont
+				$p, 2p, 3p \dots p^{\alpha-1}p$, au nombre de $p^{\alpha-1}$ :
+				\begin{align*}
+					\forall \alpha \geq 2, p \in \esP \quad
+					\phi\left(p^\alpha\right)
+					&= p^\alpha - p^{\alpha-1} \\
+					&= p^\alpha\left(1-\frac1p\right)
+				\end{align*}
+			\item Si $(m,n)=1$, comptons les nombres
+				inférieurs et premiers avec $mn$ à l'aide d'une matrice : \[
+					\left(\begin{array}{llll}
+						1 & 2 & \dots & m \\
+						m+1 & m+2 & \dots & 2m \\
+						\vdots & \vdots & \ddots & \vdots \\
+						(n-1)m+1 & (n-1)m+2 & \dots & nm
+					\end{array}\right)
+				\]
+				Regardons une colonne $r \leq m$ de la matrice :
+				\begin{enumerate}
+					\item $(r,m)=1 \implies \forall i \in [0;n-1] : (im+r,m)=1$
+					\item Les éléments sont distincts ($\mod n$) :
+						par l'absurde,
+						supposons $\exists i \neq j : im+r \equiv_n jm+r$.
+						On aurait $n/\left(i-j\right)m$, ce qui est impossible
+						puisque $(m,n)=1$ et $\left|i-j\right|<n$.
+						La colonne est donc une permutation de $[0;\phi(n)]$.
+				\end{enumerate}
+				Donc, $\phi(mn)=\phi(m)\phi(n)$.
+		\end{itemize}
+		FIXME comment conclure ?
+	\end{cproof}
+	\begin{cproof}{Buys}
+		On ajoute des facteurs $p$ :
+		\begin{itemize}
+			\item si $p/m$ (déjà utilisé) :
+				\begin{align*}
+					\forall a \in \esZ, k \in \esN \quad (mp,a)=1
+					&\dbi (m,a)=1 \\
+					&\dbi (m,a+km)=1
+				\end{align*}
+				\[
+					[1;mp] = \bigcup_{k=0}^{p-1}[km+1;km+m]
+				\]
+				Dans chaque ensemble de cette partition,
+				$\phi(m)$ éléments sont inférieurs et
+				premiers avec $mp$ : \[
+					\phi(mp)=p\phi(m)
+				\]
+			\item sinon, $\lnot(p/m)$, on ne l'a pas encore utilisé :
+				\begin{align*}
+					\forall a \in \esZ \quad (mp,a)=1
+					\dbi (m,a)=1 \land& (p,a)=1 \\
+					& \lnot(p/a)
+				\end{align*}
+				\[
+					\phi(mp)=p\phi(m)-N
+				\]
+				$N$ correspond au nombre de multiples de $p$
+				inférieurs à $mp$ et premiers avec $m$.
+				On peut montrer (TODO comment ?) que $N=\phi(m)$, d'où :
+				\begin{align*}
+					\phi(mp) &= p\phi(m) - \phi(m) && \text{substitution} \\
+					&= p\phi(m)\left(1-\frac1p\right) && p\frac1p=1
+				\end{align*}
+		\end{itemize}
+	\end{cproof}
+\end{pr}
+\begin{pr}[Exponentiation rapide]\label{pr:fastexp}
+	Soient $a,b \in \esN$.
+	On peut calculer $a^b$ en $O(\log_2b)$.
+	\begin{proof} ~
+		\begin{itemize}
+			\item Cas de base :
+				\begin{itemize}
+					\item $b=0 \implies a^b = 1$ (tant pis si $a=0$)
+					\item $b=1 \implies a^b = a$
+				\end{itemize}
+			\item Pas de récurrence :
+				\begin{itemize}
+					\item $b=2k \implies a^b =
+						\left(a^2\right)^\frac{b}2$
+					\item $b=2k+1 \implies a^b =
+						aa^{b-1}=a\left(a^2\right)^{\frac{b-1}2}$
+				\end{itemize}
+		\end{itemize}
+	\end{proof}
+\end{pr}
+\begin{pr}[Exponentiation rapide modulo]
+	Soient $a,b \in \esN$ et $m \in \esN_0$.
+	$a^b \mod m$ est calculable en $O(\log b)$.
+	\begin{proof}[Intuition]
+		On évite à chaque étape de générer des nombres trop gros puisque
+		la seule chose qui nous intéresse à la fin est leur reste.
+	\end{proof}
+\end{pr}
+\begin{thm}[Euler]
+	Soient $x \in \esZ, m \in \esN_0$. \[
+		(x,m) = 1 \implies x^{\phi(m)} \equiv_m 1
+	\]
+	\begin{proof}[Cas particulier]
+		Si $x \in \esP$, c'est Fermat.
+	\end{proof}
+	\begin{cproof}{Buys}
+		$G=\left\{a\in\esN \; \middle| \; a \leq m \land (a,m)=1\right\}$
+		forme un groupe pour la multiplication $\mod m$ :
+		\begin{itemize}
+			\item Cette multiplication est interne : le produit (dans $\esZ$)
+				de deux nombres premiers avec $m$ le reste.
+				Soit ce produit est inférieur à $m$,
+				soit on prend son modulo ($ab-km$, toujours premier avec $m$).
+			\item Cette multiplication est associative.
+			\item $1$ est le neutre du groupe :
+				\begin{itemize}
+					\item $1\in G$ car $(1,m)=1$
+					\item 1 est neutre pour le produit dans $\esZ$
+				\end{itemize}
+			\item Tout élément est inversible.
+		\end{itemize}
+		Soient $a$, un des $a_i$ et $P=a_1a_2\dots a_{\phi(m)}$ :
+		\begin{align*}
+			\left(aa_1\right)\left(aa_2\right)\dots\left(aa_{\phi(m)}\right)
+			&\equiv_m a^{\phi(m)}P && \text{associativité} \\
+			\left(aa_1\right)\left(aa_2\right)\dots\left(aa_{\phi(m)}\right)
+			&\equiv_m P && \text{facteurs distincts} \\
+			a^{\phi(m)}P &\equiv_m P && \text{transitivité} \\
+			a^{\phi(m)} &\equiv_m 1 && PP^{-1}\equiv_m1
+		\end{align*}
+		On retrouve bien l'énoncé du théorème.
+	\end{cproof}
+\end{thm}
+
+
+\section{Rivest-Shamir-Adleman}
+\begin{enumerate}
+	\item Choisir $p, q \in \esP$ suffisamment grands et pas trop proches
+		pour éviter la force brute autour de $\sqrt n$
+	\item Calculer $n=pq$
+	\item Calculer $\phi=\phi(n)=\phi(p)\phi(q)=
+		\left(p-1\right)\left(q-1\right)$
+		%ce sera toujours un multiple de 4.
+	\item Choisir $e>1$ tel que $\left(e,\phi\right)=1$ :
+		\begin{itemize}
+			\item Évidemment, $e=1 \implies \forall M : E(M)=M$...
+			\item Selon \cite{Buys} : prendre $e \in \esP, e>\phi$.
+				TODO pourquoi ne pas prendre simplement $\phi+1$ ?
+		\end{itemize}
+	\item Calculer $d$ tel que $ed \equiv_\phi 1$;
+		il existe car $\left(e,\phi\right)=1$.
+	\item Partager le couple $(n,e)$, notre clé publique
+	\item Garder précieusement le couple $(n,d)$, notre clé secrète.
+		$p$ et $q$ suffiraient mais
+		on ne veut pas refaire inutilement les calculs...
+\end{enumerate}
+
+Soit un message $M < n$
+(sinon, le modulo va le dégommer mais au pire, on le segmente) :
+\begin{align*}
+	E(M) &= M^e \mod n \\
+	D(M) &= M^d \mod n
+\end{align*}
+
+En pratique, c'est souvent une clé qui sera chiffrée/déchiffrée avec
+RSA vu sa lenteur par rapport aux chiffrements symétriques.
+
+Pour signer, on chiffre le message (typiquement son empreinte)
+avec la clé privée, ce qui permet à n'importe qui de le déchiffrer
+(les clés sont interchangeables).
+
+\begin{thm}[RSA]
+	\[
+		\left(M^e \mod n\right)^d \equiv_n M^{ed} \equiv_n M
+	\]
+	\begin{cproof}{Buys}
+		\begin{align*}
+			\exists k \in \esN \quad M^{ed}
+			&\equiv_n M^{1+k\phi}
+				&& ed\equiv_\phi1 \text{, congruence} \\
+			&\equiv_n M\left(M^\phi\right)^k
+				&& \text{propriété des exposants} \\
+			&\equiv_n M \times 1^k
+				&& \text{par Euler, } M^\phi\equiv_n 1 \\
+			&\equiv_n M
+				&& \text{1 neutre}
+		\end{align*}
+	\end{cproof}
+	\begin{cproof}{hac} ~
+		\begin{itemize}
+			\item $ed\equiv_\phi1 \dbi \exists k \in \esN : ed=1+k\phi$
+			\item Deux possibilités pour $p$ :
+				\begin{enumerate}
+					\item Si $(M,p)=1$, alors :
+						\begin{align*}
+							M^{p-1} &\equiv_p 1
+								&& \text{par Fermat} \\
+							M^{k\left(p-1\right)\left(q-1\right)} &\equiv_p 1
+								&& \text{même puissance} \\
+							M^{1+k\left(p-1\right)\left(q-1\right)} &\equiv_p M
+								&& \text{produit avec }m
+						\end{align*}
+					\item Si $(M,p)=p$, alors la dernière étape <<~annule~>>
+						tout mais la congruence reste vraie.
+				\end{enumerate}
+				Dans les deux cas, on trouve : \[
+					M^{ed} \equiv_p M
+				\]
+			\item Idem pour $q$ : \[
+					M^{ed} \equiv_q M
+				\]
+			\item Comme $p \neq q$ et $(p,q)=1$ : \[
+					M^{ed} \equiv_n M
+			\]
+		\end{itemize}
+		\emph{Ainsi, on utilise Fermat (sinon, seul Euler est utile).}
+	\end{cproof}
+\end{thm}
+
+\subsection{Optimisation}
+\begin{thm}[Restes chinois]\label{thm:chrem}
+	Soient $x,a,b \in \esN$ et $p,q \in \esN_0$ tels que $(p,q)=1$. On a : \[
+		\left\{\begin{array}{ll}
+			x \equiv_p a \\
+			x \equiv_q b
+		\end{array}\right.
+		\implies
+		\left\{\begin{array}{l}
+			\exists p' : pp'\equiv_q1 \\
+			\exists q' : qq'\equiv_p1 \\
+			x \equiv_{pq} aqq'+bpp'
+		\end{array}\right.
+	\]
+	\begin{proof}
+		$p', q'$ existent puisque par hypothèse, $(p,q)=1$.
+		$y=aqq'+bpp'$ satisfait les deux équations :
+		\begin{itemize}
+			\item $y \equiv_p aqq' + 0 \equiv_p a$
+			\item $y \equiv_q 0 + bpp' \equiv_q b$
+		\end{itemize}
+
+		Cette solution est unique modulo $pq$ : soit $z$ tel que
+		$z \equiv_p a$ et $z \equiv_q b$. Dès lors, $z-y$ est un multiple de $p$
+		et de $q$. Encore une fois, $(p,q)=1$ donc $z-y$ doit être un multiple
+		de $pq$, d'où $z \equiv_{pq} y$.
+
+		En fait, il existe une bijection
+		$\esZ_p \times \esZ_q \mapsto \esZ_{pq}$...
+	\end{proof}
+\end{thm}
+
+Selon \cite[p. 611]{hac}, le théorème \ref{thm:chrem} peut être utilisé
+pour accélérer le déchiffrement et la signature :
+\begin{enumerate}
+	\item Décomposer $M$ en un système (calculer $a, b$) : \[
+		\left\{\begin{array}{ll}
+			M \equiv_p a \\
+			M \equiv_q b
+		\end{array}\right.
+	\]
+	\item Élever les congruences à la énième puissance : \[
+		\left\{\begin{array}{ll}
+			M^n \equiv_p a^n \\
+			M^n \equiv_q b^n
+		\end{array}\right.
+	\]
+	\item Résoudre ce système (trouver $M^n \mod pq$)
+\end{enumerate}
+
+\begin{thm}[Restes chinois généralisé]\label{thm:chremg}
+	Soient $n \in \esN_0$,
+	$\forall i\neq j \in [1;n] : (m_i,m_j)=1$,
+	$\forall i \in [1;n] : a_i \in \esN$.
+	On a : \[
+		\left\{\begin{array}{ll}
+			x &\equiv_{m_1} a_1 \\
+			x &\equiv_{m_2} a_2 \\
+			&\vdots \\
+			x &\equiv_{m_n} a_n
+		\end{array}\right.
+		\dbi
+		\left\{\begin{array}{l}
+			m=m_1m_2\dots m_i \\
+			\exists y \in [0;m] \quad x \equiv_m y
+		\end{array}\right.
+	\]
+	\begin{proof}[Algorithme de Gauss] Selon \cite[p. 68]{hac},
+		\begin{align*}
+			N_i &= m/m_i \\
+			M_i &= N_i^{-1} \mod m_i \\
+			x &\equiv_m \sum_{i=1}^k a_iN_iM_i
+		\end{align*}
+
+		Chaque congruence est vérifiée (TODO rigueur).
+		L'expression analytique de $x$ s'allonge vite...
+	\end{proof}
+\end{thm}
+
+\subsection{Le danger d'un petit $e$}
+Selon \cite[p. 288]{hac}, il est intéressant de prendre un nombre avec
+peu de bits à 1 pour d'accélérer le chiffrement, par exemple 3 ou 65537...
+Il faut quand même veiller à respecter la condition : pour 3, ni $p-1$ ni $q-1$
+ne peuvent être divisibles par 3.
+
+Si le même message est envoyé à trois destinataires avec le même $e=3$,
+il est fort probable que $n_1,n_2,n_3$ soient premiers entre eux.
+Posons ce système à partir des messages interceptés : \[\left\{\begin{array}{ll}
+	M^3 \equiv_{n_1} a \\
+	M^3 \equiv_{n_2} b \\
+	M^3 \equiv_{n_3} c
+\end{array}\right.\]
+
+En utilisant le théorème \ref{thm:chremg},
+on peut retrouver $M^3 \mod n_1n_2n_3$ et en calculer la racine cubique entière.
+Le modulo ne gênera pas puisque $M^3<n_1n_2n_3$ !
+
+Pour éviter ce problème, il suffit de saler le message envoyé, c'est-à-dire y
+insérer des bits pseudo-aléatoires.
+
+
+\section{Diffie-Hellman}
+\begin{enumerate}
+	\item Alice et Bob conviennent d'un $p \in \esP$ suffisamment grand
+		et d'un générateur $g$ de $\esF_p^*$ (publics).
+	\item Alice génère et stocke $a<p$ et envoie $g^a \mod p$.
+	\item Bob génère et stocke $b<p$ et envoie $g^b \mod p$.
+	\item Chacun calcule $K = g^{ab} \mod p = r^s \mod p$, avec $r$ ce qui a été
+		reçu et $s$ son secret. $K$ est la même des deux côtés ($ab=ba$ à
+		l'exposant) mais n'a jamais été partagée explicitement.
+\end{enumerate}
+
+Attention : Alice pourrait parler à Ève, placée entre elle et Bob, en croyant
+parler à Bob. Ève n'aurait qu'à faire l'échange de clé de chaque côté.
+Il est nécessaire de signer les messages échangés
+afin de pouvoir vérifier de chaque côté d'où ils proviennent.
+
+
+\section{El Gamal}
+\begin{enumerate}
+	\item Choisir $p \in \esP$ suffisamment grand
+	\item Choisir $\alpha$, un générateur de $\esF_p^*$.
+		Pas forcément évident, voir \cite[p. 163--164]{hac}.
+	\item Choisir et garder $a \in [1;p-2]$, notre clé secrète
+	\item Calculer $\beta=\alpha^a \mod p$
+	\item Partager notre clé publique $p, \alpha, \beta$
+\end{enumerate}
+
+Chiffrement : choisir $k \in [1;p-2]$ puis calculer
+\begin{align*}
+	M_1 &= \alpha^k \mod p \\
+	M_2 &= M\beta^k \mod p
+\end{align*}
+
+On remarque qu'un message chiffré est deux fois plus long
+que le message en clair. $k$ est une clé \emph{éphémère} !
+
+Déchiffrement :
+\begin{align*}
+	M &= M_2 M_1^{-a} \mod p && \text{bof car division} \\
+	&= M_2 M_1^{(p-1)-a} \mod p && \text{idem par Fermat}
+\end{align*}
+
+\begin{thm}[El Gamal]
+	\[
+		M_1^{-a}M_2 \equiv_p M
+	\]
+	\begin{proof}
+		\begin{align*}
+			M_1^{-a}M_2
+			&\equiv_p \alpha^{-ak}M\beta^k && \text{définition de } M_1, M_2 \\
+			&\equiv_p \alpha^{-ak}M\alpha^{ak} && \text{définition de } \beta \\
+			&\equiv_p M && \alpha^{-ak}\alpha^{ak}=\alpha^0=1
+		\end{align*}
+	\end{proof}
+\end{thm}
+
+Selon \cite[p. 296]{hac}, si on intercepte deux messages chiffrés
+$E(M)=M_1,M_2$ et $E(N)=N_1,N_2$, que $M$ est connu et $k$, réutilisé,
+on peut retrouver $N$ :
+\begin{align*}
+	\frac{N_2}{M_2} &= \frac{N\beta^k}{M\beta^k} = \frac NM
+		&& \text{définition} \\
+	N &= M\frac{N_2}{M_2}
+		&& \text{algèbre} \\
+	N &\equiv_p MN_2M_2^{-1}
+		&& \text{division dans }\esF_p^*
+\end{align*}
+
+
+\bibliographystyle{alpha}
+\bibliography{refs}
+
+\end{document}
