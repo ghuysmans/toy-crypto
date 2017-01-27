@@ -375,21 +375,21 @@ de toute façon, les réels ne servent à rien ici.
 		En itérant sur les facteurs premiers de $m$, on retombe sur la formule.
 	\end{cproof}
 	\begin{cproof}{Buys}
-		On ajoute des facteurs $p$ :
+		On ajoute des facteurs $p_i$ :
 		\begin{itemize}
-			\item si $p/m$ (déjà utilisé) :
+			\item si $p_i/m$ :
 				\begin{align*}
-					\forall a \in \esZ, k \in \esN \quad (mp,a)=1
+					\forall a \in \esZ, k \in \esN \quad (mp_i,a)=1
 					&\dbi (m,a)=1 \\
 					&\dbi (m,a+km)=1
 				\end{align*}
 				\[
-					[1;mp] = \bigcup_{k=0}^{p-1}[km+1;km+m]
+					[1;mp_i] = \bigcup_{k=0}^{p_i-1}[km+1;km+m]
 				\]
 				Dans chaque ensemble de cette partition,
 				$\phi(m)$ éléments sont inférieurs et
-				premiers avec $mp$ : \[
-					\phi(mp)=p\phi(m)
+				premiers avec $mp_i$ : \[
+					\phi(mp_i)=p_i\phi(m)
 				\]
 			\item sinon, $\lnot(p/m)$, on ne l'a pas encore utilisé :
 				\begin{align*}
