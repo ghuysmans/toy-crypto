@@ -118,7 +118,7 @@ de toute façon, les réels ne servent à rien ici.
 	\end{cproof}
 \end{thm}
 \begin{thm}[Bézout]
-	Soient $a, b \in \esZ$ ($a=0 \oplus b=0$). \[
+	Soient $a, b \in \esZ$ non nuls en même temps. \[
 		\exists u, v \in \esZ : au+bv = (a, b)
 	\]
 	\begin{proof}[Bah oui !]
@@ -173,10 +173,9 @@ de toute façon, les réels ne servent à rien ici.
 	\begin{proof}[Une autre \cite{Buys}] ~
 		\begin{itemize}
 			\item[$\Rightarrow$]
-				Par définition, $d/a$ et $d/m$.
+				Par définition, $d/a$ (donc $d/ax$) et $d/m$.
 				Par hypothèse (réécrite), $m/(ax-1)$.
 				Par transitivité, $d/(ax-1)$.
-				Forcément, $d/ax$.
 				Donc $d/1$, c'est-à-dire $d=1$.
 			\item[$\Leftarrow$]
 				Par Bézout, $\exists u, v \in \esZ : au+mv \equiv_m 1$.
@@ -252,7 +251,7 @@ de toute façon, les réels ne servent à rien ici.
 			a^p
 			&= \left(1+\left(a-1\right)\right)^p && \text{artifice de calcul} \\
 			&= \sum_{k=0}^p\binom pk(a-1)^k1^{p-k} && \text{binôme de Newton} \\
-			&\equiv_p 1 + (a-1)^p && \text{TODO pourquoi ?}
+			&\equiv_p 1 + (a-1)^p && \text{seuls $k=0, k=p$ restent}
 		\end{align*}
 
 		On calcule ça $\forall i \in [1;a]$ :
@@ -283,8 +282,8 @@ de toute façon, les réels ne servent à rien ici.
 	sur deux de prouver que ce nombre n'est pas premier.
 
 	Les (rares mais infiniment nombreux) nombres de Carmichael
-	passeront toujours ce test sans être premiers.
-	On peut les tester (TODO p38 ?)
+	passeront toujours ce test sans être premiers,
+	un autre test permet de les éviter.
 	\begin{cproof}{Gillis}
 		\[
 			\forall b \in \esN_0 : b^{p-1}\equiv_p1
@@ -347,9 +346,10 @@ de toute façon, les réels ne servent à rien ici.
 				$p, 2p, 3p \dots p^{\alpha-1}p$, au nombre de $p^{\alpha-1}$ :
 				\begin{align*}
 					\forall \alpha \geq 2, p \in \esP \quad
-					\phi\left(p^\alpha\right)
-					&= p^\alpha - p^{\alpha-1} \\
+					\phi\left(p^\alpha\right) &= p^\alpha - p^{\alpha-1}
+						&& \text{tous sauf...} \\
 					&= p^\alpha\left(1-\frac1p\right)
+						&& \text{mise en évid.}
 				\end{align*}
 			\item Si $(m,n)=1$, comptons les nombres
 				inférieurs et premiers avec $mn$ à l'aide d'une matrice : \[
@@ -370,9 +370,9 @@ de toute façon, les réels ne servent à rien ici.
 						puisque $(m,n)=1$ et $\left|i-j\right|<n$.
 						La colonne est donc une permutation de $[0;\phi(n)]$.
 				\end{enumerate}
-				Donc, $\phi(mn)=\phi(m)\phi(n)$.
+				Donc, $\phi(mn)=\phi(m)\phi(n)$ : $\phi$ est multiplicative.
 		\end{itemize}
-		FIXME comment conclure ?
+		En itérant sur les facteurs premiers de $m$, on retombe sur la formule.
 	\end{cproof}
 	\begin{cproof}{Buys}
 		On ajoute des facteurs $p$ :
@@ -402,7 +402,7 @@ de toute façon, les réels ne servent à rien ici.
 				\]
 				$N$ correspond au nombre de multiples de $p$
 				inférieurs à $mp$ et premiers avec $m$.
-				On peut montrer (TODO comment ?) que $N=\phi(m)$, d'où :
+				On peut montrer (pas forcément évident) que $N=\phi(m)$, d'où :
 				\begin{align*}
 					\phi(mp) &= p\phi(m) - \phi(m) && \text{substitution} \\
 					&= p\phi(m)\left(1-\frac1p\right) && p\frac1p=1
@@ -483,11 +483,13 @@ de toute façon, les réels ne servent à rien ici.
 	\item Calculer $\phi=\phi(n)=\phi(p)\phi(q)=
 		\left(p-1\right)\left(q-1\right)$
 		%ce sera toujours un multiple de 4.
-	\item Choisir $e>1$ tel que $\left(e,\phi\right)=1$ :
+	\item Choisir $e>2$ tel que $\left(e,\phi\right)=1$ :
 		\begin{itemize}
 			\item Évidemment, $e=1 \implies \forall M : E(M)=M$...
+			\item On ne peut pas prendre $e=2$ car $\exists k\in\esN : \phi=4k$.
 			\item Selon \cite{Buys} : prendre $e \in \esP, e>\phi$.
-				TODO pourquoi ne pas prendre simplement $\phi+1$ ?
+			\item Ne pas choisir $e=\phi+1$ car $e^2 \equiv_\phi 1$,
+				donc par unicité, $d=e$, ça ne nous intéresse pas.
 		\end{itemize}
 	\item Calculer $d$ tel que $ed \equiv_\phi 1$;
 		il existe car $\left(e,\phi\right)=1$.
@@ -698,6 +700,7 @@ Il est nécessaire de signer les messages échangés
 afin de pouvoir vérifier de chaque côté d'où ils proviennent.
 
 
+\newpage
 \section{El Gamal}
 \begin{enumerate}
 	\item Choisir $p \in \esP$ suffisamment grand
@@ -750,6 +753,7 @@ on peut retrouver $N$ :
 \end{align*}
 
 
+\newpage
 \bibliographystyle{alpha}
 \bibliography{refs}
 
