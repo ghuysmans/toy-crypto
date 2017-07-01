@@ -35,7 +35,7 @@ let () =
       let public, secret = generate bits in
       print_endline "public key:";
       export_key public stdout;
-      output_string stderr "secret key:";
+      output_string stderr "secret key:\n";
       export_key secret stderr
     )
     else if (cmd = "encrypt" || cmd = "decrypt") && n_args = 3 then (
