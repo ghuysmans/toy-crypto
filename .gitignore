@@ -1,6 +1,7 @@
 *.byte
+*.native
 _tags
-_build
+_build/
 *.key
 *.dh
 

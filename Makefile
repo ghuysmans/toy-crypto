@@ -1,9 +1,12 @@
 all: a-shared.dh
 
+OCAMLFLAGS=-lib nums -use-ocamlfind -pkg ppx_deriving_yojson
 clean:
 	rm a-to-b.dh b-to-a.dh a-shared.dh a-secret.dh
 %.byte: %.ml
-	ocamlbuild -lib nums $@
+	ocamlbuild $(OCAMLFLAGS) $@
+%.native: %.ml
+	ocamlbuild $(OCAMLFLAGS) $@
 
 TOOL=toy.byte
 params.dh: $(TOOL)

@@ -3,18 +3,18 @@ This is a simple (and insecure) implementation of RSA and Diffie-Hellman.
 Most algorithms are proven (in French) in a LaTeX document.
 
 ## Implementation
-A functor allows using different number representations:
-- `int`
-- `Big_int`
+The `Numbers.Make` functor allows using any `Concrete` number representation:
+- `Int` (31- or 63-bit OCaml integer, nice for testing purpose)
+- `Bigint` (values are tagged, not directly saved as strings)
 
-Phantom types allow statically differentiating public and private keys.
+Phantom types allow statically differentiating `public` and `private` keys.
 
 ## Structure
-- `crypto.ml` contains the library
+- `numbers.ml`, `rsa.ml`, and `diffie_hellman.ml` contain the library
 - `toy.ml` is a simple CLI tool
 - `rsa.tex` contains proofs in French
 
 ## How to build
 ```
-ocamlbuild -lib nums toy.byte
+make toy.byte
 ```
