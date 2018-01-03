@@ -1,9 +1,11 @@
 module Make (M: Numbers.S) = struct
   open M.N
 
-  type 'a key = {modulus: t; exponent: t} [@@deriving yojson]
+  type ('a, 'b) key = {modulus: t; exponent: t} [@@deriving yojson]
   type secret
   type public
+  type exportable
+  type non_exportable
 
   let derive p q =
     let phi = (p - one) * (q - one) in
@@ -37,4 +39,20 @@ module Make (M: Numbers.S) = struct
 
   let check public ~signature input =
     rsa public signature = input
+
+  let secure = ignore
+
+  exception Not_so_phantom_type
+
+  let diverge _ =
+    (* typing trick: phantom types don't need converters (hence _) since there
+       aren't any associated data (by definition)... The type is universally
+       quantified, though, so I guess this is an explicit way to produce 'a. *)
+    raise Not_so_phantom_type
+
+  let export k =
+    key_to_yojson diverge diverge k
+
+  let import j =
+    key_of_yojson diverge diverge j
 end
