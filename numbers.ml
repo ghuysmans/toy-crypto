@@ -96,25 +96,21 @@ module Make (N: Concrete) = struct
       failwith "non-invertible value"
 
   let random ~bits =
-    let step = 30 in
-    let rec f blocks a =
-      if blocks = 0 then
-        a
-      else
-        let a =
-          let open N in
-          let small = Random.bits () in
-          let shifted = a lsl step in
-          shifted + (of_int small)
-        in
-        f (blocks - 1) a
+    let rec f a = function
+      | 0 -> a
+      | n when n < 30 ->
+        let useless = 30 - n in
+        let small = N.(of_int (Random.bits ()) lsr useless) in
+        N.((a lsl n) lor small)
+      | n ->
+        (* use all 30 bits *)
+        let a = N.((a lsl 30) lor (of_int (Random.bits ()))) in
+        f a (n - 30)
     in
-    if bits mod step = 0 then
-      f (bits / step) N.zero
-    else
-      f (bits / step + 1) N.zero
+    f N.zero bits
 
   let rec random_prime ~bits =
+    assert (bits > 1);
     let n = oddify (random ~bits) in
     if fermat n then
       n
