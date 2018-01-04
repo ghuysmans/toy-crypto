@@ -14,7 +14,7 @@ module Make (M: Numbers.S) = struct
     let secret = M.random ~bits in
     secret, M.modpow generator secret modulus
 
-  let derive {modulus; _} secret received_challenge =
+  let derive {modulus; _} ~secret received_challenge =
     (* on both sides, (g ^ remote) ^ local = g ^ (remote * local) *)
     M.modpow received_challenge secret modulus
 end
