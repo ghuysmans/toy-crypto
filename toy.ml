@@ -175,7 +175,7 @@ let () =
   let toy =
     let doc = "a cryptographic toy" in
     Term.(ret @@ const @@ `Help (`Pager, None)),
-    Term.info "toy" ~doc
+    Term.info "toy-crypto" ~doc
   in
   Term.(exit @@ eval_choice toy [
     (* Text *)
