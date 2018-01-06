@@ -16,8 +16,8 @@ let read_n ?f () =
     | Some fn -> Yojson.Safe.from_file fn
   in
   match M.N.of_yojson j with
-  | Error e -> prerr_endline e; exit 1
-  | Ok n -> n
+  | Result.Error e -> prerr_endline e; exit 1
+  | Result.Ok n -> n
 
 let decode () =
   read_n () |>
@@ -38,8 +38,8 @@ let generate bits =
 
 let read_key k =
   match RSA.import @@ Yojson.Safe.from_file k with
-  | Error e -> prerr_endline e; exit 2
-  | Ok key -> key
+  | Result.Error e -> prerr_endline e; exit 2
+  | Result.Ok key -> key
 
 let encrypt key =
   let pub = read_key key in
@@ -76,8 +76,8 @@ let parameters bits =
 
 let read_params f =
   match DH.parameters_of_yojson @@ Yojson.Safe.from_file f with
-  | Error e -> prerr_endline e; exit 2
-  | Ok p -> p
+  | Result.Error e -> prerr_endline e; exit 2
+  | Result.Ok p -> p
 
 let challenge params =
   let p = read_params params in

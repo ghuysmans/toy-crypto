@@ -6,12 +6,12 @@ let to_yojson n =
   u_to_yojson (`Big_int (string_of_big_int n))
 let of_yojson j =
   match  u_of_yojson j with
-  | (Error _) as e -> e
-  | Ok (`Big_int s) ->
+  | (Result.Error _) as e -> e
+  | Result.Ok (`Big_int s) ->
     try
-      Ok (big_int_of_string s)
+      Result.Ok (big_int_of_string s)
     with Failure e ->
-      Error e
+      Result.Error e
 
 let zero = zero_big_int
 let one = unit_big_int
