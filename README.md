@@ -14,7 +14,16 @@ Phantom types allow statically differentiating `public` and `private` keys.
 - `toy.ml` is a simple CLI tool
 - `rsa.tex` contains proofs in French
 
-## How to build
+## How to...
+
+### Install through opam
 ```
-make toy.byte
+opam pin add toy-crypto https://github.com/ghuysmans/toy-crypto.git
+```
+
+### Build from source (manually)
+```
+opam pin add -n .
+opam install --deps-only toy-crypto
+make
 ```
