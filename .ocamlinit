@@ -1,0 +1,13 @@
+#use "topfind"
+#require "ppx_deriving_yojson"
+#directory "_build"
+#load "int.cmo"
+#load "numbers.cmo"
+#load "rsa.cmo"
+#load "diffie_hellman.cmo"
+module M = Numbers.Make (Int)
+module RSA = Rsa.Make (M)
+module DH = Diffie_hellman.Make (M)
+#show_module M
+#show_module RSA
+#show_module DH

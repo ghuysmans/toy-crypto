@@ -1,1 +1,1 @@
-include Numbers.Concrete
+include Numbers.Concrete with type t = int
