@@ -7,7 +7,7 @@ homepage: "https://github.com/ghuysmans/toy-crypto/"
 bug-reports: "https://github.com/ghuysmans/toy-crypto/issues"
 dev-repo: "https://github.com/ghuysmans/toy-crypto/"
 build: [
-  [make "toy.native" "toy_crypto.cma" "toy_crypto.cmxa"]
+  [make]
 ]
 depends: [
   "ocamlfind"
