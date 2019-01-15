@@ -5,16 +5,4 @@ _build/
 *.key
 *.dh
 
-*.aux
-*.log
-*.out
-*.toc
-*.idx
-*.ilg
-*.ind
-*.pdf
-*.bib
-*.bbl
-*.blg
-
 *.swp
