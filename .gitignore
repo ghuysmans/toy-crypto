@@ -1,8 +1,3 @@
-*.byte
-*.native
-_tags
 _build/
-*.key
-*.dh
-
+.merlin
 *.swp

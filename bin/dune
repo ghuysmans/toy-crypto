@@ -1,0 +1,6 @@
+(executable
+ (name main)
+ (libraries toy_crypto))
+(install
+ (section bin)
+ (files (main.exe as toy-crypto)))

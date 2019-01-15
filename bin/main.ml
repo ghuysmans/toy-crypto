@@ -1,3 +1,4 @@
+open Toy_crypto
 module M = Numbers.Make (Bigint)
 
 let write_n ?(ch=stdout) n =

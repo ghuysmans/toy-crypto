@@ -1,0 +1,8 @@
+(library
+ (name toy_crypto)
+ (libraries num ppx_deriving_yojson.runtime ppx_deriving_yojson yojson cmdliner)
+ (preprocess (pps ppx_deriving_yojson)))
+(env
+ (dev
+  ;FIXME update to a more recent version of ppx_deriving?
+  (flags (:standard -warn-error -6-27-39))))
