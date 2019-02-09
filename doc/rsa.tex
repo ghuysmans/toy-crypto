@@ -464,9 +464,9 @@ de toute façon, les réels ne servent à rien ici.
 		Soient $a$, un des $a_i$ et $P=a_1a_2\dots a_{\phi(m)}$ :
 		\begin{align*}
 			\left(aa_1\right)\left(aa_2\right)\dots\left(aa_{\phi(m)}\right)
-			&\equiv_m a^{\phi(m)}P && \text{associativité} \\
+			&\equiv_m a^{\phi(m)}P && \text{assoc. et comm.} \\
 			\left(aa_1\right)\left(aa_2\right)\dots\left(aa_{\phi(m)}\right)
-			&\equiv_m P && \text{facteurs distincts} \\
+			&\equiv_m P && \text{par Fermat (\ref{thm:fermat})} \\
 			a^{\phi(m)}P &\equiv_m P && \text{transitivité} \\
 			a^{\phi(m)} &\equiv_m 1 && PP^{-1}\equiv_m1
 		\end{align*}
@@ -587,7 +587,7 @@ avec la clé privée, ce qui permet à n'importe qui de le déchiffrer
 			x \equiv_p a \\
 			x \equiv_q b
 		\end{array}\right.
-		\implies
+		\dbi
 		\left\{\begin{array}{l}
 			\exists p' : pp'\equiv_q1 \\
 			\exists q' : qq'\equiv_p1 \\
@@ -607,8 +607,9 @@ avec la clé privée, ce qui permet à n'importe qui de le déchiffrer
 		et de $q$. Encore une fois, $(p,q)=1$ donc $z-y$ doit être un multiple
 		de $pq$, d'où $z \equiv_{pq} y$.
 
-		En fait, il existe une bijection
-		$\esZ_p \times \esZ_q \mapsto \esZ_{pq}$...
+		En fait, on vient de montrer l'existence d'une bijection
+		$\esZ_p \times \esZ_q \rightarrow \esZ_{pq}$ :
+		ces groupes sont isomorphes !
 	\end{proof}
 \end{thm}
 
