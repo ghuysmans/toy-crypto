@@ -1,0 +1,3 @@
+(executable
+ (modules_without_implementation model)
+ (name test))
