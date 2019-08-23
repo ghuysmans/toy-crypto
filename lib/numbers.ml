@@ -34,7 +34,11 @@ module type S = sig
 end
 
 module Make (N: Concrete) = struct
-  module N = N
+  module N = struct
+    include N
+    let (<) a b = N.(not (a = b) && a <= b)
+  end
+
 
   let even n = N.(n land one = zero)
   let half n = N.(n lsr 1)
