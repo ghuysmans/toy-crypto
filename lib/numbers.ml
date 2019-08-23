@@ -24,7 +24,8 @@ module type S = sig
   module N : Concrete
   val modpow: N.t -> N.t -> m:N.t -> N.t
   val fermat: N.t -> bool
-  val euclid: N.t -> N.t -> N.t * N.t * N.t
+  type e = {r: N.t; u: N.t; v: N.t}
+  val euclid: N.t -> N.t -> e
   val gcd: N.t -> N.t -> N.t
   val inv: N.t -> m:N.t -> N.t
   val random: bits:int -> N.t
@@ -75,11 +76,13 @@ module Make (N: Concrete) = struct
     in
     f 200
 
+  type e = {r: N.t; u: N.t; v: N.t}
+
   let euclid a b = (* taken from Wikipedia *)
     let open N in
     let rec f r u v r' u' v' =
       if r' = zero then
-        r (* gcd *), u, v
+        {r; u; v}
       else
         let q = r / r' in
         f r' u' v' (r - q * r') (u - q * u') (v - q * v')
@@ -87,12 +90,12 @@ module Make (N: Concrete) = struct
     f a one zero b zero one
 
   let gcd a b =
-    let r, _, _ = euclid a b in
+    let {r; _} = euclid a b in
     r
 
   let inv x ~m =
     let open N in
-    let r, x', _ = euclid x m in
+    let {r; u = x'; _} = euclid x m in
     if r = one then
       if x' < zero then x' + m else x'
     else

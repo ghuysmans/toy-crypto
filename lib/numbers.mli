@@ -24,7 +24,10 @@ module type S = sig
   module N : Concrete
   val modpow: N.t -> N.t -> m:N.t -> N.t
   val fermat: N.t -> bool
-  val euclid: N.t -> N.t -> N.t * N.t * N.t
+  type e = {r: N.t; u: N.t; v: N.t}
+  val euclid: N.t -> N.t -> e
+  (** [euclid a b] returns an [e] such that $r = au + bv = gcd(a, b)$ *)
+
   val gcd: N.t -> N.t -> N.t
   val inv: N.t -> m:N.t -> N.t
   val random: bits:int -> N.t
