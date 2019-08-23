@@ -28,6 +28,7 @@ module type S = sig
   val euclid: N.t -> N.t -> e
   val gcd: N.t -> N.t -> N.t
   val inv: N.t -> m:N.t -> N.t
+  val crt: N.t * N.t -> N.t * N.t -> N.t
   val random: bits:int -> N.t
   val random_prime: bits:int -> N.t
   val of_string : string -> N.t
@@ -101,6 +102,12 @@ module Make (N: Concrete) = struct
     else
       (* this should not happen *)
       failwith "non-invertible value"
+
+  let crt (a, p) (b, q) =
+    let open N in
+    let p1, q1 = inv p ~m:q, inv q ~m:p in
+    let n = (a * q1 * q + b * p1 * p) mod (p * q) in
+    if n < zero then n + p * q else n
 
   let random ~bits =
     let rec f a = function

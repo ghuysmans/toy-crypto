@@ -1,5 +1,5 @@
-(executable
- (name main)
+(executables
+ (names main chinese)
  (libraries toy_crypto))
 (install
  (section bin)
