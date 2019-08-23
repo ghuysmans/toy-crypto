@@ -66,7 +66,7 @@ module Make (N: Concrete) = struct
     in
     let rec f = function
       | 0 -> true
-      | i when rejected () -> false
+      | _ when rejected () -> false
       | i -> f (i - 1)
     in
     f 200

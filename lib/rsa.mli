@@ -13,6 +13,6 @@ module Make: functor (M: Numbers.S) -> sig
   type exportable
   type non_exportable
   val secure: (_, non_exportable) key -> unit
-  val export: (_, exportable) key -> Yojson.Safe.json
-  val import: Yojson.Safe.json -> (_,_) key Ppx_deriving_yojson_runtime.error_or
+  val export: (_, exportable) key -> Yojson.Safe.t
+  val import: Yojson.Safe.t -> (_,_) key Ppx_deriving_yojson_runtime.error_or
 end
