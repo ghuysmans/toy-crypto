@@ -12,9 +12,9 @@ module Make (M: Numbers.S) = struct
 
   let challenge {modulus; generator; bits} =
     let secret = M.random ~bits in
-    secret, M.modpow generator secret modulus
+    secret, M.modpow generator secret ~m:modulus
 
   let derive {modulus; _} ~secret received_challenge =
     (* on both sides, (g ^ remote) ^ local = g ^ (remote * local) *)
-    M.modpow received_challenge secret modulus
+    M.modpow received_challenge secret ~m:modulus
 end

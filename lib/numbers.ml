@@ -62,7 +62,7 @@ module Make (N: Concrete) = struct
     let rejected () =
       let open N in
       let a = of_int (Random.bits ()) mod (n - one) + one in
-      not (modpow a (pred n) n= one)
+      not (modpow a (pred n) ~m:n = one)
     in
     let rec f = function
       | 0 -> true

@@ -26,7 +26,7 @@ module Make (M: Numbers.S) = struct
     {modulus; exponent = e}, {modulus; exponent = d}
 
   let rsa {modulus; exponent} input =
-    M.modpow input exponent modulus
+    M.modpow input exponent ~m:modulus
 
   let generate ~bits =
     let p = M.random_prime ~bits in
