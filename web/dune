@@ -1,0 +1,4 @@
+(executable
+ (name client)
+ (modes js)
+ (libraries toy_crypto js_of_ocaml))

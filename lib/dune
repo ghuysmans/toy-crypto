@@ -1,6 +1,6 @@
 (library
  (name toy_crypto)
- (libraries num ppx_deriving_yojson yojson cmdliner)
+ (libraries num)
  (preprocess (pps ppx_deriving_yojson)))
 (env
  (dev
