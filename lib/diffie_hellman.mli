@@ -17,7 +17,7 @@ module Make :
         } [@@deriving yojson]
         type transmitted
         type returned
-        type _ codes = M.N.t list [@@deriving yojson]
+        type _ codes [@@deriving yojson]
         val request : parameters -> string list -> t * transmitted codes
         val reply : parameters -> t -> transmitted codes -> returned codes
         val intersection : t -> other:returned codes -> returned codes -> string list
