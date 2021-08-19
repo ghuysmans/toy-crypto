@@ -35,13 +35,19 @@ module Make (M: Numbers.S) = struct
       let snds = Array.(make (length a) (snd a.(0))) in
       Array.mapi (fun i (x, y) -> snds.(i) <- y; x) a, snds
 
+  type private_set = {
+    secret: M.N.t;
+    plain: string array;
+  } [@@deriving yojson]
+
   let hash ({bits; _} as p) plain =
     let secret = M.random ~bits in
     let a = Array.map (fun x -> x, Digest.string x |> M.of_string |> derive p ~secret) plain in
     shuffle a;
-    secret, split a
+    let plain, codes = split a in
+    {secret; plain}, codes
 
-  let reveal p ~secret a =
+  let reveal p {secret; _} a =
     Array.map (derive p ~secret) a |>
     Array.to_list
 
@@ -58,7 +64,7 @@ module Make (M: Numbers.S) = struct
         1
   end)
 
-  let intersection plain ~other back =
+  let intersection {plain; _} ~other back =
     let s = S.of_list other in
     List.combine (Array.to_list plain) back |>
     List.filter (fun (_, code) -> S.mem code s) |>

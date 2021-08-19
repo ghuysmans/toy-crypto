@@ -11,7 +11,11 @@ module Make :
       val derive : parameters -> secret:M.N.t -> M.N.t -> M.N.t
 
       (* FIXME write about this *)
-      val hash : parameters -> string array -> M.N.t * (string array * M.N.t array)
-      val reveal : parameters -> secret:M.N.t -> M.N.t array -> M.N.t list
-      val intersection : string array -> other:M.N.t list -> M.N.t list -> string list
+      type private_set = {
+        secret: M.N.t;
+        plain: string array;
+      } [@@deriving yojson]
+      val hash : parameters -> string array -> private_set * M.N.t array
+      val reveal : parameters -> private_set -> M.N.t array -> M.N.t list
+      val intersection : private_set -> other:M.N.t list -> M.N.t list -> string list
     end
