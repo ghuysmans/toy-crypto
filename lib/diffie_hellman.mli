@@ -10,15 +10,16 @@ module Make :
       val challenge : parameters -> M.N.t * M.N.t
       val derive : parameters -> secret:M.N.t -> M.N.t -> M.N.t
 
-      (* FIXME write about this *)
-      type private_set = {
-        secret: M.N.t;
-        plain: string list;
-      } [@@deriving yojson]
-      type transmitted
-      type returned
-      type _ codes = M.N.t list [@@deriving yojson]
-      val hash : parameters -> string list -> private_set * transmitted codes
-      val reveal : parameters -> private_set -> transmitted codes -> returned codes
-      val intersection : private_set -> other:returned codes -> returned codes -> string list
+      module PSI : sig
+        type t = {
+          secret: M.N.t;
+          plain: string list;
+        } [@@deriving yojson]
+        type transmitted
+        type returned
+        type _ codes = M.N.t list [@@deriving yojson]
+        val request : parameters -> string list -> t * transmitted codes
+        val reply : parameters -> t -> transmitted codes -> returned codes
+        val intersection : t -> other:returned codes -> returned codes -> string list
+      end
     end
