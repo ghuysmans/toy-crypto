@@ -28,28 +28,31 @@ module Make (M: Numbers.S) = struct
       a.(i) <- tmp
     done
 
-  let split a =
-    if Array.length a = 0 then
-      [| |], [| |]
-    else
-      let snds = Array.(make (length a) (snd a.(0))) in
-      Array.mapi (fun i (x, y) -> snds.(i) <- y; x) a, snds
+  let shuffle_list l =
+    let a = Array.of_list l in
+    shuffle a;
+    Array.to_list a
 
   type private_set = {
     secret: M.N.t;
-    plain: string array;
+    plain: string list;
   } [@@deriving yojson]
+
+  type transmitted
+  type returned
+  type _ codes = M.N.t list [@@deriving yojson]
 
   let hash ({bits; _} as p) plain =
     let secret = M.random ~bits in
-    let a = Array.map (fun x -> x, Digest.string x |> M.of_string |> derive p ~secret) plain in
-    shuffle a;
-    let plain, codes = split a in
+    let plain, codes =
+      shuffle_list plain |>
+      List.map (fun x -> x, Digest.string x |> M.of_string |> derive p ~secret) |>
+      List.split
+    in
     {secret; plain}, codes
 
   let reveal p {secret; _} a =
-    Array.map (derive p ~secret) a |>
-    Array.to_list
+    List.map (derive p ~secret) a
 
   (* FIXME move into Numbers? *)
   module S = Set.Make (struct
@@ -66,7 +69,7 @@ module Make (M: Numbers.S) = struct
 
   let intersection {plain; _} ~other back =
     let s = S.of_list other in
-    List.combine (Array.to_list plain) back |>
+    List.combine plain back |>
     List.filter (fun (_, code) -> S.mem code s) |>
     List.map fst
 end

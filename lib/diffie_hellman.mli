@@ -13,9 +13,12 @@ module Make :
       (* FIXME write about this *)
       type private_set = {
         secret: M.N.t;
-        plain: string array;
+        plain: string list;
       } [@@deriving yojson]
-      val hash : parameters -> string array -> private_set * M.N.t array
-      val reveal : parameters -> private_set -> M.N.t array -> M.N.t list
-      val intersection : private_set -> other:M.N.t list -> M.N.t list -> string list
+      type transmitted
+      type returned
+      type _ codes = M.N.t list [@@deriving yojson]
+      val hash : parameters -> string list -> private_set * transmitted codes
+      val reveal : parameters -> private_set -> transmitted codes -> returned codes
+      val intersection : private_set -> other:returned codes -> returned codes -> string list
     end
