@@ -119,12 +119,15 @@ let request params private_set =
     with End_of_file ->
       !l
   in
-  let ps, codes = DH.PSI.request params plain in
-  DH.PSI.to_yojson ps |> Yojson.Safe.to_file private_set;
+  let ps, codes =
+    let f x = Digest.string x |> M.of_string in
+    DH.PSI.request params f plain
+  in
+  DH.PSI.to_yojson DH.PSI.str_to_yojson ps |> Yojson.Safe.to_file private_set;
   write_codes M.N.to_yojson codes
 
 let read_private_set f =
-  match Yojson.Safe.from_file f |> DH.PSI.of_yojson with
+  match Yojson.Safe.from_file f |> DH.PSI.of_yojson DH.PSI.str_of_yojson with
   | Result.Error e -> prerr_endline e; exit 3
   | Result.Ok ps -> ps
 

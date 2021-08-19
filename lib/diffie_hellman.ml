@@ -35,20 +35,20 @@ module Make (M: Numbers.S) = struct
 
   (* TODO write about Private Set Intersection *)
   module PSI = struct
-    type t = {
+    type 'a t = {
       secret: M.N.t;
-      plain: string list;
+      plain: 'a list;
     } [@@deriving yojson]
 
     type transmitted
     type returned
     type ('a, _) codes = 'a list [@@deriving yojson]
 
-    let request ({bits; _} as p) plain =
+    let request ({bits; _} as p) f plain =
       let secret = M.random ~bits in
       let plain, codes =
         shuffle_list plain |>
-        List.map (fun x -> x, Digest.string x |> M.of_string |> derive p ~secret) |>
+        List.map (fun x -> x, f x |> derive p ~secret) |>
         List.split
       in
       {secret; plain}, codes
