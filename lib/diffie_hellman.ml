@@ -42,7 +42,7 @@ module Make (M: Numbers.S) = struct
 
     type transmitted
     type returned
-    type _ codes = M.N.t list [@@deriving yojson]
+    type ('a, _) codes = 'a list [@@deriving yojson]
 
     let request ({bits; _} as p) plain =
       let secret = M.random ~bits in
@@ -56,20 +56,28 @@ module Make (M: Numbers.S) = struct
     let reply p {secret; _} a =
       List.map (derive p ~secret) a
 
-    (* FIXME move into Numbers? *)
-    module S = Set.Make (struct
-      type t = M.N.t
-      let compare x y =
-        let open M.N in
-        if x = y then
-          0
-        else if x <= y then
-          -1
-        else
-          1
-    end)
+    let map = List.map
 
-    let intersection {plain; _} ~other back =
+    (* FIXME move into Numbers? *)
+    let compare x y =
+      let open M.N in
+      if x = y then
+        0
+      else if x <= y then
+        -1
+      else
+        1
+
+    type str = string [@@deriving yojson]
+
+    let hash x =
+      M.to_string x |> Digest.string |> Digest.to_hex
+
+    let intersection (type t) {plain; _} ~compare ~other back =
+      let module S = Set.Make (struct
+        type nonrec t = t
+        let compare = compare
+      end) in
       let s = S.of_list other in
       List.combine plain back |>
       List.filter (fun (_, code) -> S.mem code s) |>

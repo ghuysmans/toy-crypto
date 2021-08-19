@@ -17,9 +17,13 @@ module Make :
         } [@@deriving yojson]
         type transmitted
         type returned
-        type _ codes [@@deriving yojson]
-        val request : parameters -> string list -> t * transmitted codes
-        val reply : parameters -> t -> transmitted codes -> returned codes
-        val intersection : t -> other:returned codes -> returned codes -> string list
+        type ('a, _) codes [@@deriving yojson]
+        val request : parameters -> string list -> t * (M.N.t, transmitted) codes
+        val reply : parameters -> t -> (M.N.t, transmitted) codes -> (M.N.t, returned) codes
+        val map : ('a -> 'b) -> ('a, 'c) codes -> ('b, 'c) codes
+        val compare : M.N.t -> M.N.t -> int
+        type str = string [@@deriving yojson]
+        val hash : M.N.t -> string
+        val intersection : t -> compare:('a -> 'a -> int) -> other:('a, returned) codes -> ('a, returned) codes -> string list
       end
     end

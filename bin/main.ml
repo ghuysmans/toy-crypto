@@ -93,18 +93,18 @@ let derive params f =
   DH.derive p ~secret |>
   write_n
 
-let read_codes ?f () =
+let read_codes ?f conv () =
   let j =
     match f with
     | None -> Yojson.Safe.from_channel stdin
     | Some fn -> Yojson.Safe.from_file fn
   in
-  match DH.PSI.codes_of_yojson j with
+  match DH.PSI.codes_of_yojson conv j with
   | Result.Error e -> prerr_endline e; exit 4
   | Result.Ok c -> c
 
-let write_codes codes =
-  DH.PSI.codes_to_yojson codes |>
+let write_codes conv codes =
+  DH.PSI.codes_to_yojson conv codes |>
   Yojson.Safe.to_channel stdout
 
 let request params private_set =
@@ -121,7 +121,7 @@ let request params private_set =
   in
   let ps, codes = DH.PSI.request params plain in
   DH.PSI.to_yojson ps |> Yojson.Safe.to_file private_set;
-  write_codes codes
+  write_codes M.N.to_yojson codes
 
 let read_private_set f =
   match Yojson.Safe.from_file f |> DH.PSI.of_yojson with
@@ -131,14 +131,21 @@ let read_private_set f =
 let reply params private_set =
   let params = read_params params in
   let private_set = read_private_set private_set in
-  read_codes () |> DH.PSI.reply params private_set |> write_codes
+  read_codes M.N.of_yojson () |>
+  DH.PSI.reply params private_set |>
+  DH.PSI.(map hash) |>
+  write_codes DH.PSI.str_to_yojson
 
 let inter params private_set other returned =
   let params = read_params params in
   let private_set = read_private_set private_set in
-  let other = read_codes ~f:other () |> DH.PSI.reply params private_set in
-  let returned = read_codes ~f:returned () in
-  DH.PSI.intersection private_set ~other returned |>
+  let other =
+    read_codes ~f:other M.N.of_yojson () |>
+    DH.PSI.reply params private_set |>
+    DH.PSI.(map hash)
+  in
+  let returned = read_codes ~f:returned DH.PSI.str_of_yojson () in
+  DH.PSI.intersection private_set ~compare:compare ~other returned |>
   List.iter print_endline
 
 
