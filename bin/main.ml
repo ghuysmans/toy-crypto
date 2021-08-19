@@ -93,6 +93,54 @@ let derive params f =
   DH.derive p ~secret |>
   write_n
 
+let read_codes ?f () =
+  let j =
+    match f with
+    | None -> Yojson.Safe.from_channel stdin
+    | Some fn -> Yojson.Safe.from_file fn
+  in
+  match DH.PSI.codes_of_yojson j with
+  | Result.Error e -> prerr_endline e; exit 4
+  | Result.Ok c -> c
+
+let write_codes codes =
+  DH.PSI.codes_to_yojson codes |>
+  Yojson.Safe.to_channel stdout
+
+let request params private_set =
+  let params = read_params params in
+  let plain =
+    let l = ref [] in
+    try
+      while true do
+        l := read_line () :: !l
+      done;
+      []
+    with End_of_file ->
+      !l
+  in
+  let ps, codes = DH.PSI.request params plain in
+  DH.PSI.to_yojson ps |> Yojson.Safe.to_file private_set;
+  write_codes codes
+
+let read_private_set f =
+  match Yojson.Safe.from_file f |> DH.PSI.of_yojson with
+  | Result.Error e -> prerr_endline e; exit 3
+  | Result.Ok ps -> ps
+
+let reply params private_set =
+  let params = read_params params in
+  let private_set = read_private_set private_set in
+  read_codes () |> DH.PSI.reply params private_set |> write_codes
+
+let inter params private_set other returned =
+  let params = read_params params in
+  let private_set = read_private_set private_set in
+  let other = read_codes ~f:other () |> DH.PSI.reply params private_set in
+  let returned = read_codes ~f:returned () in
+  DH.PSI.intersection private_set ~other returned |>
+  List.iter print_endline
+
 
 open Cmdliner
 
@@ -144,7 +192,7 @@ let parameters_cmd =
 
 let parameters_arg =
   let doc = "Diffie-Hellman parameter file" in
-  Arg.(required & pos 0 (some file) None & info [] ~doc ~docv:"PARAMS")
+  Arg.(required & pos 0 (some file) None & info [] ~doc ~docv:"DH-PARAMS")
 
 let challenge_cmd =
   let doc = "generate a Diffie-Hellman challenge" in
@@ -159,6 +207,29 @@ let derive_cmd =
   let doc = "derive a shared key in a Diffie-Hellman challenge" in
   Term.(const derive $ parameters_arg $ secret_arg),
   Term.info "dh-derive" ~doc
+
+let private_set_arg t =
+  let doc = "Diffie-Hellman private set file" in
+  Arg.(required & opt (some t) None & info ~doc ["s"])
+
+let request_cmd =
+  let doc = "request Private Set Intersection" in
+  Term.(const request $ parameters_arg $ private_set_arg Arg.string),
+  Term.info "psi-request" ~doc
+
+let reply_cmd =
+  let doc = "reply to Private Set Intersection request" in
+  Term.(const reply $ parameters_arg $ private_set_arg Arg.file),
+  Term.info "psi-reply" ~doc
+
+let intersect_cmd =
+  let codes doc l = Arg.(required & opt (some file) None & info ~doc l) in
+  let doc = "compute Private Set Intersection" in
+  Term.(const inter $ parameters_arg
+                    $ private_set_arg Arg.file
+                    $ codes "codes sent by the other participant" ["o"; "other"]
+                    $ codes "our codes that have returned" ["r"; "returned"]),
+  Term.info "psi-intersect" ~doc
 
 let encode_cmd =
   let doc = "encode the standard input's first line" in
@@ -192,4 +263,8 @@ let () =
     parameters_cmd;
     challenge_cmd;
     derive_cmd;
+    (* PSI *)
+    request_cmd;
+    reply_cmd;
+    intersect_cmd;
   ])
