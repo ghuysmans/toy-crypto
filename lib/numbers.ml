@@ -33,6 +33,7 @@ module type S = sig
   val random_prime: bits:int -> N.t
   val of_string : string -> N.t
   val to_string : N.t -> string
+  val compare : N.t -> N.t -> int
 end
 
 module Make (N: Concrete) = struct
@@ -156,4 +157,13 @@ module Make (N: Concrete) = struct
         f (i + 1) a
     in
     f 0 N.zero
+
+  let compare x y =
+    let open N in
+    if x = y then
+      0
+    else if x <= y then
+      -1
+    else
+      1
 end

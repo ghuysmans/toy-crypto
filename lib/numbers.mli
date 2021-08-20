@@ -31,12 +31,13 @@ module type S = sig
   val gcd: N.t -> N.t -> N.t
   val inv: N.t -> m:N.t -> N.t
   val crt: N.t * N.t -> N.t * N.t -> N.t
-  (* [crt (a, p) (b, q)] solves ${x = a mod p, x = b mod q}$ *)
+  (** [crt (a, p) (b, q)] solves ${x = a mod p, x = b mod q}$ *)
 
   val random: bits:int -> N.t
   val random_prime: bits:int -> N.t
   val of_string : string -> N.t
   val to_string : N.t -> string
+  val compare : N.t -> N.t -> int
 end
 
 module Make: functor (N: Concrete) -> S with module N = N

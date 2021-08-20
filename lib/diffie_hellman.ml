@@ -58,16 +58,6 @@ module Make (M: Numbers.S) = struct
 
     let map = List.map
 
-    (* FIXME move into Numbers? *)
-    let compare x y =
-      let open M.N in
-      if x = y then
-        0
-      else if x <= y then
-        -1
-      else
-        1
-
     type str = string [@@deriving yojson]
 
     let hash x =
