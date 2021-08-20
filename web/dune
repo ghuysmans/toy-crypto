@@ -1,4 +1,5 @@
 (executable
  (name client)
  (modes js)
- (libraries toy_crypto js_of_ocaml))
+ (libraries toy_crypto js_of_ocaml)
+ (preprocess (pps js_of_ocaml-ppx ppx_deriving_yojson)))
