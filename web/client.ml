@@ -1,19 +1,4 @@
-module N = Toy_crypto.Numbers.Make (struct
-  include Big_int
-
-  type u = [`Big_int of string] [@@deriving yojson]
-  let to_yojson n =
-    u_to_yojson (`Big_int (to_string n))
-  let of_yojson j =
-    match  u_of_yojson j with
-    | (Result.Error _) as e -> e
-    | Result.Ok (`Big_int s) ->
-      try
-        Result.Ok (of_string s)
-      with Failure e ->
-        Result.Error e
-end)
-
+module N = Toy_crypto.Numbers.Make (Toy_crypto.Bigint.Make (Big_int))
 module Rsa = Toy_crypto.Rsa.Make (N)
 
 let () =

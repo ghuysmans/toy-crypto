@@ -1,6 +1,5 @@
 (library
  (name toy_crypto)
- (libraries num)
  (preprocess (pps ppx_deriving_yojson)))
 (env
  (dev

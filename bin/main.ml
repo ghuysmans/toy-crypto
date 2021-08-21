@@ -1,5 +1,5 @@
 open Toy_crypto
-module M = Numbers.Make (Bigint)
+module M = Numbers.Make (Bigint.Make (Big_int))
 
 let write_n ?(ch=stdout) n =
   M.N.to_yojson n |>

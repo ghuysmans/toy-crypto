@@ -1,6 +1,6 @@
 (executables
  (names main chinese)
- (libraries toy_crypto cmdliner))
+ (libraries toy_crypto cmdliner num))
 (install
  (section bin)
  (files (main.exe as toy-crypto)))
