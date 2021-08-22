@@ -2,7 +2,11 @@ The pure OCaml library is __unbearably slow__ when running on Node.js,
 and modern JavaScript implementations provide big integers (`BigInt`),
 so let's give [https://github.com/ghuysmans/num-jsoo](num-jsoo) a try!
 ```
-$ dune build benchmark/{native_pure.exe,byte_pure.bc,node_pure.bc.js,node_jsoo.bc.js}
+$ dune build benchmark/{native_zarith.exe,native_pure.exe,byte_pure.bc,node_pure.bc.js,node_jsoo.bc.js}
+$ time dune exec benchmark/native_zarith.exe
+real    0m4.426s
+user    0m4.364s
+sys     0m0.062s
 $ time dune exec benchmark/native_pure.bc
 real    0m12.757s
 user    0m12.688s
