@@ -1,6 +1,7 @@
 (library (name bench) (modules bench) (libraries toy_crypto))
 (executable (name native_pure) (modes native) (modules native_pure) (libraries bench num))
 (executable (name native_zarith) (modes native) (modules native_zarith) (libraries bench zarith))
+(executable (name native_zarith_2) (modes native) (modules native_zarith_2) (libraries bench zarith))
 (executable (name byte_pure) (modes byte) (modules byte_pure) (libraries bench num))
 (executable (name node_pure) (modes js) (modules node_pure) (libraries bench num))
 (executable (name node_jsoo) (modes js) (modules node_jsoo) (libraries bench num-jsoo))

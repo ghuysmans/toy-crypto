@@ -3,6 +3,14 @@ and modern JavaScript implementations provide big integers (`BigInt`),
 so let's give [https://github.com/ghuysmans/num-jsoo](num-jsoo) a try!
 ```
 $ dune build benchmark/{native_zarith.exe,native_pure.exe,byte_pure.bc,node_pure.bc.js,node_jsoo.bc.js}
+$ time dune exec benchmark/native_zarith_2.exe #nextprime, powm
+real    0m0.195s
+user    0m0.140s
+sys     0m0.055s
+$ time dune exec benchmark/native_zarith_2.exe #nextprime
+real    0m0.219s
+user    0m0.161s
+sys     0m0.059s
 $ time dune exec benchmark/native_zarith.exe
 real    0m4.426s
 user    0m4.364s
